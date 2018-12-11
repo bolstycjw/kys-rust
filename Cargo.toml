@@ -5,6 +5,7 @@ authors = ["Broly CJW <brolycjw@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+byteorder = "1.2.7"
 
 [dependencies.sdl2]
 version = "0.32.0-beta.2"
