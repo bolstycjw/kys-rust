@@ -24,10 +24,14 @@ const TILE_HEIGHT: u32 = 18;
 const HALF_TILE_HEIGHT: u32 = TILE_HEIGHT / 2;
 const IMAGE_WIDTH: u32 = 64 * TILE_WIDTH + SCREEN_WIDTH;
 const IMAGE_HEIGHT: u32 = 64 * TILE_HEIGHT + SCREEN_HEIGHT;
+const SCALED_TILE_WIDTH: u32 = IMAGE_WIDTH / 64;
+const SCALED_TILE_HEIGHT: u32 = IMAGE_HEIGHT / 64;
+const SCALED_HALF_TILE_WIDTH: u32 = SCALED_TILE_WIDTH / 2;
+const SCALED_HALF_TILE_HEIGHT: u32 = SCALED_TILE_HEIGHT / 2;
 
 pub fn cart_to_iso(cart: Point) -> Point {
-    let x = HALF_TILE_WIDTH as i32 * (cart.x - cart.y) + CENTER_X - 18;
-    let y = HALF_TILE_HEIGHT as i32 * (cart.x + cart.y);
+    let x = SCALED_HALF_TILE_WIDTH as i32 * (cart.x - cart.y) + IMAGE_WIDTH as i32 / 2 - 18;
+    let y = SCALED_HALF_TILE_HEIGHT as i32 * (cart.x + cart.y);
     Point::new(x, y)
 }
 
@@ -52,10 +56,10 @@ pub fn main() -> io::Result<()> {
     let mut file = File::open("./game/save/ALLSIN.GRP")?;
     file.read(&mut buf);
     let mut rdr = Cursor::new(buf);
-    for x in 0..64 {
-        for y in 0..64 {
-            scene[x][y] = rdr.read_u16::<LittleEndian>().unwrap();
-            print!("{},", scene[x][y]);
+    for y in 0..64 {
+        for x in 0..64 {
+            scene[y][x] = rdr.read_u16::<LittleEndian>().unwrap();
+            print!("{},", scene[y][x]);
         }
         println!();
     }
@@ -78,21 +82,24 @@ pub fn main() -> io::Result<()> {
     let mut target_texture = texture_creator
         .create_texture_target(None, IMAGE_WIDTH, IMAGE_HEIGHT)
         .unwrap();
-    for i in 0..64 {
-        for j in 0..64 {
-            let loc = cart_to_iso(Point::new(i, j));
-            let dest = Rect::new(loc.x, loc.y, TILE_WIDTH, TILE_HEIGHT);
-            let num = (scene[i as usize][j as usize] / 2) as usize;
-            canvas.with_texture_canvas(&mut target_texture, |texture_canvas| {
-                texture_canvas
-                    .copy(&textures[num], None, dest)
-                    .expect("Render failed");
-            });
+    for y in 0..64 {
+        for x in 0..64 {
+            let loc = cart_to_iso(Point::new(x, y));
+            let dest = Rect::new(loc.x, loc.y, SCALED_TILE_WIDTH, SCALED_TILE_HEIGHT);
+            let num = (scene[y as usize][x as usize] / 2) as usize;
             canvas
-                .copy(&target_texture, None, None)
-                .expect("Render failed");
+                .with_texture_canvas(&mut target_texture, |texture_canvas| {
+                    texture_canvas
+                        .copy(&textures[num], None, dest)
+                        .expect("Render failed");
+                })
+                .unwrap();
         }
     }
+    let dest = Rect::new(800, 300, SCREEN_WIDTH, SCREEN_HEIGHT);
+    canvas
+        .copy(&target_texture, dest, None)
+        .expect("Render failed");
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
