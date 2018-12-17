@@ -1,2 +1,2 @@
-pub mod gfx;
+pub mod display;
 pub mod math;

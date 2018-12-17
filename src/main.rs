@@ -44,29 +44,29 @@ pub fn main() -> io::Result<()> {
 
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     let texture_creator = canvas.texture_creator();
-    let textures = engine::gfx::load_tiles(&texture_creator);
-    let mut target_texture = texture_creator
-        .create_texture_target(None, IMAGE_WIDTH, IMAGE_HEIGHT)
-        .unwrap();
-    for y in 0..64 {
-        for x in 0..64 {
-            let loc = engine::math::cart_to_iso(Point::new(x, y));
-            let dest = Rect::new(loc.x, loc.y, SCALED_TILE_WIDTH, SCALED_TILE_HEIGHT);
-            let num = (scene[y as usize][x as usize] / 2) as usize;
-            canvas
-                .with_texture_canvas(&mut target_texture, |texture_canvas| {
-                    texture_canvas
-                        .copy(&textures[num], None, dest)
-                        .expect("Render failed");
-                })
-                .unwrap();
-        }
-    }
-    let dest = Rect::new(800, 300, SCREEN_WIDTH, SCREEN_HEIGHT);
-    canvas
-        .copy(&target_texture, dest, None)
-        .expect("Render failed");
-    canvas.present();
+    // let textures = engine::gfx::load_tiles(&texture_creator);
+    // let mut target_texture = texture_creator
+    //     .create_texture_target(None, IMAGE_WIDTH, IMAGE_HEIGHT)
+    //     .unwrap();
+    // for y in 0..64 {
+    //     for x in 0..64 {
+    //         let loc = engine::math::cart_to_iso(Point::new(x, y));
+    //         let dest = Rect::new(loc.x, loc.y, SCALED_TILE_WIDTH, SCALED_TILE_HEIGHT);
+    //         let num = (scene[y as usize][x as usize] / 2) as usize;
+    //         canvas
+    //             .with_texture_canvas(&mut target_texture, |texture_canvas| {
+    //                 texture_canvas
+    //                     .copy(&textures[num], None, dest)
+    //                     .expect("Render failed");
+    //             })
+    //             .unwrap();
+    //     }
+    // }
+    // let dest = Rect::new(800, 300, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // canvas
+    //     .copy(&target_texture, dest, None)
+    //     .expect("Render failed");
+    // canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
     'running: loop {
         for event in event_pump.poll_iter() {
