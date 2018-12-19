@@ -1,6 +1,19 @@
 use crate::engine::Context;
 
-pub fn run<'a, 'b: 'a>(ctx: &'a mut Context<'b>) {
-    let disp_ctx = &mut ctx.disp_ctx;
-    disp_ctx.load_tileset();
+pub struct Game<'a> {
+    context: Context<'a>,
+}
+
+impl<'a> Game<'a> {
+    pub fn new() -> Game<'a> {
+        let context = Context::init();
+        Game { context }
+    }
+
+    pub fn load_assets(&mut self) {
+        let disp_ctx = &mut self.context.display_context;
+        disp_ctx.load_tileset();
+    }
+
+    pub fn load_data(&mut self) {}
 }

@@ -38,7 +38,7 @@ impl<'a, 'b: 'a> DisplayContext<'b> {
     pub fn load_tileset(&'a mut self) {
         let mut tiles: Vec<Tile> = Vec::new();
         let tile_index = load_index().unwrap();
-        for i in 0..tile_index.len() {
+        for i in 0..tile_index.len() / 2 {
             let pathname = format!("./game/resource/smap/{}.png", i);
             let mut frame_count = 0;
             let mut texture_paths = Vec::new();
