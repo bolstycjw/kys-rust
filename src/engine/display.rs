@@ -28,7 +28,7 @@ pub fn load_tileset(ctx: &mut Context) {
                 pathname = format!("./game/resource/smap/{}_{}.png", i, frame_count);
             }
         }
-        let texture_creator = ctx.texture_creator;
+        let texture_creator = &ctx.texture_creator;
         let mut textures = Vec::new();
         for pathname in texture_paths.iter() {
             let texture = texture_creator.load_texture(&pathname).unwrap();
