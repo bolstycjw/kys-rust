@@ -3,17 +3,14 @@ use sdl2::render::TextureCreator;
 use sdl2::video::{Window, WindowContext};
 use sdl2::Sdl;
 
-use crate::engine::display::tile::Tileset;
-
-pub struct Context<'a> {
+pub struct Context {
     pub sdl_context: Sdl,
     pub canvas: Canvas<Window>,
     pub texture_creator: TextureCreator<WindowContext>,
-    pub tilesets: Vec<Tileset<'a>>,
 }
 
-impl<'a> Context<'a> {
-    pub fn init() -> Context<'a> {
+impl<'a> Context {
+    pub fn init() -> Context {
         let sdl_context = sdl2::init().unwrap();
         let video_subsystem = sdl_context.video().unwrap();
         let window = video_subsystem
@@ -27,7 +24,6 @@ impl<'a> Context<'a> {
             sdl_context,
             canvas,
             texture_creator,
-            tilesets: Vec::new(),
         }
     }
 }

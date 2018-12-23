@@ -1,12 +1,10 @@
 use byteorder::{LittleEndian, ReadBytesExt};
-use std::fs;
 use std::io::Cursor;
 
-pub struct Layer([[u16; 64]; 64]);
+pub struct Layer(pub [[u16; 64]; 64]);
 
 impl Layer {
-    pub fn from(buf: &Vec<u8>) -> Layer {
-        let mut rdr = Cursor::new(buf);
+    pub fn read(rdr: &mut Cursor<Vec<u8>>) -> Layer {
         let mut layer = [[0; 64]; 64];
         for i in 0..64 {
             let mut row = [0; 64];
@@ -27,18 +25,41 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn handle_events() {}
-
-    pub fn render() {}
+    pub fn read(rdr: &mut Cursor<Vec<u8>>) -> Scene {
+        let ground = Layer::read(rdr);
+        let building = Layer::read(rdr);
+        let object = Layer::read(rdr);
+        let event = Layer::read(rdr);
+        let building_depth = Layer::read(rdr);
+        let object_depth = Layer::read(rdr);
+        Scene {
+            ground,
+            building,
+            object,
+            event,
+            building_depth,
+            object_depth,
+        }
+    }
 }
 
-pub fn load_scenes() {
-    let buf = fs::read("./game/save/ALLSIN.GRP").unwrap();
-    let layer = Layer::from(&buf);
-    for y in 0..64 {
-        for x in 0..64 {
-            print!("{},", layer.0[y][x]);
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use super::*;
+
+    #[test]
+    fn internal() {
+        let buf = fs::read("./bin/save/ALLSIN.GRP").unwrap();
+        let mut rdr = Cursor::new(buf);
+        let scene = Scene::read(&mut rdr);
+        for y in 0..64 {
+            for x in 0..64 {
+                print!("{},", scene.object_depth.0[y][x]);
+            }
+            println!("")
         }
-        println!("")
+        assert!(false);
     }
 }
