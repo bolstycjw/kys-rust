@@ -29,7 +29,7 @@ pub fn main() {
     window.set_lazy(true);
     while let Some(e) = window.next() {
         window.draw_2d(&e, |c, g| {
-            clear([1.0; 4], g);
+            clear([0.5, 0.0, 0.0, 0.0], g);
             image(&rust_logo, c.transform, g);
         });
     }
