@@ -1,14 +1,4 @@
-pub trait EventHandler {
-    fn handle_events(&self) {}
+pub trait State {
+    // fn handle_events(&mut self);
+    // fn render(&'a mut self, context: &'a RefCell<Context>);
 }
-
-pub trait Renderable {
-    fn render(&self) {}
-}
-
-pub enum State {
-    Scene,
-}
-
-impl EventHandler for State {}
-impl Renderable for State {}

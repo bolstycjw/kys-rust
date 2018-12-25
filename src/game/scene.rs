@@ -1,6 +1,8 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::Cursor;
 
+use super::state::State;
+
 pub struct Layer(pub [[u16; 64]; 64]);
 
 impl Layer {

@@ -6,8 +6,6 @@ edition = "2018"
 
 [dependencies]
 byteorder = "1.2.7"
-
-[dependencies.sdl2]
-version = "0.32.0-beta.2"
-default-features = false
-features = ["image"]
+piston_window = "0.85.0"
+find_folder = "0.3.0"
+image = "0.20.0"
