@@ -1,4 +1,5 @@
 extern crate find_folder;
+extern crate opengl_graphics;
 extern crate piston_window;
 
 mod config;

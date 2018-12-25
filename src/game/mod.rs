@@ -13,7 +13,6 @@ use self::state::State;
 use self::title::Title;
 
 pub struct Game {
-    scenes: Vec<Scene>,
     state: Box<dyn State>,
 }
 
@@ -21,7 +20,6 @@ impl Game {
     pub fn new() -> Self {
         {
             Self {
-                scenes: Vec::new(),
                 state: Box::new(Title {}),
             }
         }
@@ -46,18 +44,8 @@ impl Game {
         while let Some(e) = window.next() {
             window.draw_2d(&e, |c, g| {
                 clear([1.0; 4], g);
-                image(&rust_logo, c.transform, g);
+                self.state.render(c, g);
             });
-        }
-    }
-
-    pub fn load_scenes(&mut self) {
-        let buf = fs::read("./bin/save/ALLSIN.GRP").unwrap();
-        let mut rdr = Cursor::new(buf);
-
-        for _i in 0..100 {
-            let scene = Scene::read(&mut rdr);
-            self.scenes.push(scene);
         }
     }
 }
