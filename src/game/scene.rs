@@ -1,5 +1,6 @@
 use byteorder::{LittleEndian, ReadBytesExt};
-use opengl_graphics::*;
+use gfx_device_gl::{CommandBuffer, Resources};
+use gfx_graphics::GfxGraphics;
 use piston_window::*;
 use std::fs;
 use std::io::Cursor;
@@ -24,7 +25,7 @@ impl Layer {
 
 pub struct Scene {
     scenes: Vec<SceneData>,
-    current: u16,
+    current: usize,
     tileset: Tileset,
 }
 
@@ -38,12 +39,14 @@ pub struct SceneData {
 }
 
 impl State for Scene {
-    fn render(&self, c: &Context, g: &mut GlGraphics) {
-        let SceneData { ground, .. } = self.scenes[self.current];
+    fn on_load(&mut self, window: &mut PistonWindow) {}
+
+    fn render(&self, c: &Context, g: &mut GfxGraphics<Resources, CommandBuffer>) {
+        let SceneData { ground, .. } = &self.scenes[self.current];
         for y in 0..64 {
             for x in 0..64 {
-                let num = ground[y][x];
-                let tile = tileset[num];
+                let num = ground.0[y][x] as usize;
+                let tile = &self.tileset.0[num];
                 let src_rect = [
                     tile.x_off as f64,
                     tile.y_off as f64,
@@ -60,7 +63,7 @@ impl Scene {
         let tileset = load_tileset("./bin/resource/smap");
         let buf = fs::read("./bin/save/ALLSIN.GRP").unwrap();
         let mut rdr = Cursor::new(buf);
-        let scenes = Vec::new();
+        let mut scenes = Vec::new();
 
         for _i in 0..100 {
             let scene = SceneData::read(&mut rdr);
@@ -75,14 +78,14 @@ impl Scene {
 }
 
 impl SceneData {
-    pub fn read(rdr: &mut Cursor<Vec<u8>>) -> Scene {
+    pub fn read(rdr: &mut Cursor<Vec<u8>>) -> Self {
         let ground = Layer::read(rdr);
         let building = Layer::read(rdr);
         let object = Layer::read(rdr);
         let event = Layer::read(rdr);
         let building_depth = Layer::read(rdr);
         let object_depth = Layer::read(rdr);
-        Scene {
+        Self {
             ground,
             building,
             object,

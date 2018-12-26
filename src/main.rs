@@ -1,5 +1,6 @@
 extern crate find_folder;
-extern crate opengl_graphics;
+extern crate gfx_device_gl;
+extern crate gfx_graphics;
 extern crate piston_window;
 
 mod config;
@@ -18,6 +19,6 @@ pub fn main() {
 
     window.set_lazy(true);
 
-    let game = game::Game::new();
+    let mut game = game::Game::new();
     game.run(&mut window);
 }

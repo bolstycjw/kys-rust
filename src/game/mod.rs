@@ -5,10 +5,7 @@ pub mod title;
 
 use piston_window::*;
 use std::boxed::Box;
-use std::fs;
-use std::io::Cursor;
 
-use self::scene::Scene;
 use self::state::State;
 use self::title::Title;
 
@@ -20,7 +17,7 @@ impl Game {
     pub fn new() -> Self {
         {
             Self {
-                state: Box::new(Title {}),
+                state: Box::new(Title::new()),
             }
         }
     }
@@ -29,22 +26,21 @@ impl Game {
         self.state = next_state;
     }
 
-    pub fn run(&self, window: &mut PistonWindow) {
-        let assets = find_folder::Search::ParentsThenKids(3, 3)
-            .for_folder("assets")
+    pub fn run(&mut self, window: &mut PistonWindow) {
+        let opengl = OpenGL::V3_2;
+        let mut window: PistonWindow = WindowSettings::new("piston: image", [300, 300])
+            .exit_on_esc(true)
+            .opengl(opengl)
+            .build()
             .unwrap();
-        let rust_logo = assets.join("rust.png");
-        let rust_logo: G2dTexture = Texture::from_path(
-            &mut window.factory,
-            &rust_logo,
-            Flip::None,
-            &TextureSettings::new(),
-        )
-        .unwrap();
+
+        window.set_lazy(true);
+
+        self.state.on_load(&mut window);
         while let Some(e) = window.next() {
             window.draw_2d(&e, |c, g| {
                 clear([1.0; 4], g);
-                self.state.render(c, g);
+                self.state.render(&c, g);
             });
         }
     }
