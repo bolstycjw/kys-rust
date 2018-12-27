@@ -8,6 +8,7 @@ use std::boxed::Box;
 
 use self::state::State;
 use self::title::Title;
+use crate::config::*;
 
 pub struct Game {
     state: Box<dyn State>,
@@ -28,11 +29,12 @@ impl Game {
 
     pub fn run(&mut self, window: &mut PistonWindow) {
         let opengl = OpenGL::V3_2;
-        let mut window: PistonWindow = WindowSettings::new("piston: image", [300, 300])
-            .exit_on_esc(true)
-            .opengl(opengl)
-            .build()
-            .unwrap();
+        let mut window: PistonWindow =
+            WindowSettings::new("piston: image", [SCREEN_WIDTH, SCREEN_HEIGHT])
+                .exit_on_esc(true)
+                .opengl(opengl)
+                .build()
+                .unwrap();
 
         window.set_lazy(true);
 

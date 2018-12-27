@@ -39,7 +39,11 @@ pub struct SceneData {
 }
 
 impl State for Scene {
-    fn on_load(&mut self, window: &mut PistonWindow) {}
+    fn on_load(&mut self, window: &mut PistonWindow) {
+        let smap = find_folder::Search::ParentsThenKids(3, 3)
+            .for_folder("smap")
+            .unwrap();
+    }
 
     fn render(&self, c: &Context, g: &mut GfxGraphics<Resources, CommandBuffer>) {
         let SceneData { ground, .. } = &self.scenes[self.current];

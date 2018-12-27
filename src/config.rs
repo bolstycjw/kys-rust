@@ -1,6 +1,6 @@
 pub const SCREEN_WIDTH: u32 = 800;
 pub const CENTER_X: i32 = SCREEN_WIDTH as i32 / 2;
-pub const SCREEN_HEIGHT: u32 = 800;
+pub const SCREEN_HEIGHT: u32 = 600;
 pub const CENTER_Y: i32 = SCREEN_HEIGHT as i32 / 2;
 pub const TILE_WIDTH: u32 = 36;
 pub const HALF_TILE_WIDTH: u32 = TILE_WIDTH / 2;
