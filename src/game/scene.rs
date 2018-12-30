@@ -2,17 +2,19 @@ use byteorder::{LittleEndian, ReadBytesExt};
 use gfx_device_gl::{CommandBuffer, Resources};
 use gfx_graphics::GfxGraphics;
 use piston_window::*;
-use std::fs;
-use std::io::Cursor;
+use std::fs::File;
 
 use super::state::State;
 use super::tile::{load_tileset, Tileset};
 use crate::config::*;
 
+const LAYER_SIZE_BYTES: u64 = 64 * 64 * 2;
+const SCENE_SIZE_BYTES: u64 = LAYER_SIZE_BYTES * 6;
+
 pub struct Layer(pub [[u16; 64]; 64]);
 
 impl Layer {
-    pub fn read(rdr: &mut Cursor<Vec<u8>>) -> Layer {
+    pub fn read(rdr: &mut File) -> Layer {
         let mut layer = [[0; 64]; 64];
         for i in 0..64 {
             let mut row = [0; 64];
@@ -24,26 +26,34 @@ impl Layer {
 }
 
 pub struct Scene {
-    scenes: Vec<SceneData>,
-    current: usize,
-    tileset: Option<Tileset>,
-    next_state: Option<Box<dyn State>>,
-}
-
-pub struct SceneData {
     ground: Layer,
     building: Layer,
     object: Layer,
     event: Layer,
     building_depth: Layer,
     object_depth: Layer,
+    tileset: Option<Tileset>,
+    next_state: Option<Box<dyn State>>,
+}
+
+impl Clone for Scene {
+    fn clone(&self) -> Self {
+        Self {
+            scenes: &self.scenes.to_vec(),
+            ..*self
+        }
+    }
 }
 
 impl State for Scene {
+    fn box_clone(&self) -> Box<dyn State> {
+        Box::new(self.clone())
+    }
+
     fn handle_events(&mut self, event: &Event) {}
 
-    fn next_state(&self) -> &Option<Box<dyn State>> {
-        &self.next_state
+    fn next_state(&self) -> Option<Box<dyn State>> {
+        self.next_state
     }
 
     fn on_load(&mut self, window: &mut PistonWindow) {
@@ -54,7 +64,7 @@ impl State for Scene {
     }
 
     fn render(&self, c: &Context, g: &mut GfxGraphics<Resources, CommandBuffer>) {
-        let SceneData { ground, .. } = &self.scenes[self.current];
+        let Scene { ground, .. } = &self;
         for y in 0..64 {
             for x in 0..64 {
                 let num = ground.0[y][x] as usize;
@@ -73,26 +83,7 @@ impl State for Scene {
 }
 
 impl Scene {
-    pub fn new() -> Self {
-        let buf = fs::read("./bin/save/ALLSIN.GRP").unwrap();
-        let mut rdr = Cursor::new(buf);
-        let mut scenes = Vec::new();
-
-        for _i in 0..100 {
-            let scene = SceneData::read(&mut rdr);
-            scenes.push(scene);
-        }
-        Self {
-            scenes,
-            current: 0,
-            tileset: None,
-            next_state: None,
-        }
-    }
-}
-
-impl SceneData {
-    pub fn read(rdr: &mut Cursor<Vec<u8>>) -> Self {
+    pub fn read(rdr: &mut File) -> Self {
         let ground = Layer::read(rdr);
         let building = Layer::read(rdr);
         let object = Layer::read(rdr);
@@ -106,6 +97,8 @@ impl SceneData {
             event,
             building_depth,
             object_depth,
+            tileset: None,
+            next_state: None,
         }
     }
 }
@@ -118,12 +111,12 @@ mod tests {
 
     #[test]
     fn internal() {
-        let buf = fs::read("./bin/save/ALLSIN.GRP").unwrap();
-        let mut rdr = Cursor::new(buf);
-        let scene = Scene::read(&mut rdr);
+        let mut file = File::open("./bin/save/ALLSIN.GRP").unwrap();
+        file.seek(SeekFrom::Start(64 * 64 * 6 * 2));
+        let scene = Scene::read(&mut file);
         for y in 0..64 {
             for x in 0..64 {
-                print!("{},", scene.object_depth.0[y][x]);
+                print!("{},", scene.ground.0[y][x]);
             }
             println!("")
         }

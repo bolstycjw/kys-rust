@@ -5,6 +5,7 @@ use piston_window::*;
 use super::state::State;
 use crate::config::*;
 
+#[derive(Clone)]
 pub struct Title {
     title: Option<G2dTexture>,
     next_state: Option<Box<dyn State>>,
@@ -20,10 +21,14 @@ impl Title {
 }
 
 impl State for Title {
+    fn box_clone(&self) -> Box<dyn State> {
+        Box::new((*self).clone())
+    }
+
     fn handle_events(&mut self, event: &Event) {}
 
-    fn next_state(&self) -> &Option<Box<dyn State>> {
-        &self.next_state
+    fn next_state(&self) -> Option<Box<dyn State>> {
+        self.next_state
     }
 
     fn on_load(&mut self, window: &mut PistonWindow) {
