@@ -78,7 +78,8 @@ impl State for Scene {
 impl Scene {
     pub fn load(scene_id: u16) -> Self {
         let mut file = File::open("./bin/save/ALLSIN.GRP").unwrap();
-        file.seek(SeekFrom::Start(scene_id as u64 * SCENE_SIZE_BYTES));
+        file.seek(SeekFrom::Start(scene_id as u64 * SCENE_SIZE_BYTES))
+            .unwrap();
         let ground = Layer::read(&mut file);
         let building = Layer::read(&mut file);
         let object = Layer::read(&mut file);
