@@ -28,7 +28,7 @@ impl State for Title {
     fn handle_events(&mut self, event: &Event) {}
 
     fn next_state(&self) -> Option<Box<dyn State>> {
-        self.next_state
+        self.next_state.clone()
     }
 
     fn on_load(&mut self, window: &mut PistonWindow) {
