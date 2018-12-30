@@ -26,7 +26,8 @@ impl Layer {
 pub struct Scene {
     scenes: Vec<SceneData>,
     current: usize,
-    tileset: Tileset,
+    tileset: Option<Tileset>,
+    next_state: Option<Box<dyn State>>,
 }
 
 pub struct SceneData {
@@ -39,10 +40,17 @@ pub struct SceneData {
 }
 
 impl State for Scene {
+    fn handle_events(&mut self, event: &Event) {}
+
+    fn next_state(&self) -> &Option<Box<dyn State>> {
+        &self.next_state
+    }
+
     fn on_load(&mut self, window: &mut PistonWindow) {
         let smap = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("smap")
             .unwrap();
+        self.tileset = Some(load_tileset(&smap, window));
     }
 
     fn render(&self, c: &Context, g: &mut GfxGraphics<Resources, CommandBuffer>) {
@@ -50,13 +58,15 @@ impl State for Scene {
         for y in 0..64 {
             for x in 0..64 {
                 let num = ground.0[y][x] as usize;
-                let tile = &self.tileset.0[num];
-                let src_rect = [
-                    tile.x_off as f64,
-                    tile.y_off as f64,
-                    TILE_WIDTH as f64,
-                    TILE_HEIGHT as f64,
-                ];
+                if let Some(tileset) = &self.tileset {
+                    let tile = &tileset.0[num];
+                    let src_rect = [
+                        tile.x_off as f64,
+                        tile.y_off as f64,
+                        TILE_WIDTH as f64,
+                        TILE_HEIGHT as f64,
+                    ];
+                };
             }
         }
     }
@@ -64,7 +74,6 @@ impl State for Scene {
 
 impl Scene {
     pub fn new() -> Self {
-        let tileset = load_tileset("./bin/resource/smap");
         let buf = fs::read("./bin/save/ALLSIN.GRP").unwrap();
         let mut rdr = Cursor::new(buf);
         let mut scenes = Vec::new();
@@ -76,7 +85,8 @@ impl Scene {
         Self {
             scenes,
             current: 0,
-            tileset,
+            tileset: None,
+            next_state: None,
         }
     }
 }

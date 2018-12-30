@@ -7,15 +7,25 @@ use crate::config::*;
 
 pub struct Title {
     title: Option<G2dTexture>,
+    next_state: Option<Box<dyn State>>,
 }
 
 impl Title {
     pub fn new() -> Self {
-        Self { title: None }
+        Self {
+            title: None,
+            next_state: None,
+        }
     }
 }
 
 impl State for Title {
+    fn handle_events(&mut self, event: &Event) {}
+
+    fn next_state(&self) -> &Option<Box<dyn State>> {
+        &self.next_state
+    }
+
     fn on_load(&mut self, window: &mut PistonWindow) {
         let resource = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("resource")

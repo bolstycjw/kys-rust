@@ -40,6 +40,7 @@ impl Game {
 
         self.state.on_load(&mut window);
         while let Some(e) = window.next() {
+            self.state.handle_events(&e);
             window.draw_2d(&e, |c, g| {
                 clear([1.0; 4], g);
                 self.state.render(&c, g);
