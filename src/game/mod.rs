@@ -23,8 +23,10 @@ impl Game {
         }
     }
 
-    pub fn change_state(&mut self, next_state: Box<dyn State>) {
-        self.state = next_state;
+    pub fn change_state(&mut self, maybe_next_state: Option<Box<dyn State>>) {
+        if let Some(next_state) = maybe_next_state {
+            self.state = next_state;
+        };
     }
 
     pub fn run(&mut self, window: &mut PistonWindow) {
@@ -36,15 +38,21 @@ impl Game {
                 .build()
                 .unwrap();
 
-        window.set_lazy(true);
-
         self.state.on_load(&mut window);
-        while let Some(e) = window.next() {
-            self.state.handle_events(&e);
-            window.draw_2d(&e, |c, g| {
-                clear([1.0; 4], g);
-                self.state.render(&c, g);
-            });
+        let mut events = Events::new(EventSettings::new());
+        while let Some(e) = events.next(&mut window) {
+            if let Some(r) = e.render_args() {
+                window.draw_2d(&e, |c, g| {
+                    clear([0.0; 4], g);
+                });
+                self.state.render(&e, &mut window);
+            };
+
+            if let Some(_args) = e.button_args() {
+                self.state.handle_events(&e);
+            };
+
+            self.change_state(self.state.next_state());
         }
     }
 }

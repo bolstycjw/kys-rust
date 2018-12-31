@@ -1,7 +1,6 @@
-use gfx_device_gl::{CommandBuffer, Resources};
-use gfx_graphics::GfxGraphics;
 use piston_window::*;
 
+use super::scene::Scene;
 use super::state::State;
 use crate::config::*;
 
@@ -25,7 +24,12 @@ impl State for Title {
         Box::new((*self).clone())
     }
 
-    fn handle_events(&mut self, event: &Event) {}
+    fn handle_events(&mut self, event: &Event) {
+        if let Some(Button::Keyboard(key)) = event.press_args() {
+            println!("Pressed keybaord key '{:?}", key);
+            self.next_state = Some(Box::new(Scene::load(0)));
+        };
+    }
 
     fn next_state(&self) -> Option<Box<dyn State>> {
         self.next_state.clone()
@@ -46,12 +50,15 @@ impl State for Title {
         self.title = Some(rust_logo);
     }
 
-    fn render(&self, c: &Context, g: &mut GfxGraphics<Resources, CommandBuffer>) {
+    fn render(&mut self, e: &Event, window: &mut PistonWindow) {
         if let Some(rust_logo) = &self.title {
             let (width, height) = rust_logo.get_size();
             let sx = SCREEN_WIDTH as f64 / width as f64;
             let sy = SCREEN_HEIGHT as f64 / height as f64;
-            image(rust_logo, c.transform.scale(sx, sy), g);
+            window.draw_2d(e, |c, g| {
+                clear([1.0; 4], g);
+                image(rust_logo, c.transform.scale(sx, sy), g);
+            });
         }
     }
 }

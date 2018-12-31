@@ -1,5 +1,3 @@
-use gfx_device_gl::{CommandBuffer, Resources};
-use gfx_graphics::GfxGraphics;
 use piston_window::*;
 
 pub trait State {
@@ -11,7 +9,7 @@ pub trait State {
 
     fn on_load(&mut self, window: &mut PistonWindow);
 
-    fn render(&self, c: &Context, g: &mut GfxGraphics<Resources, CommandBuffer>);
+    fn render(&mut self, e: &Event, window: &mut PistonWindow);
 }
 
 impl Clone for Box<dyn State> {

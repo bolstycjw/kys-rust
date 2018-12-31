@@ -1,6 +1,5 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use piston_window::*;
-use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Cursor;
@@ -18,7 +17,7 @@ pub struct Tile {
 #[derive(Clone)]
 pub struct TileManager {
     path: PathBuf,
-    cache: RefCell<HashMap<usize, Rc<Tile>>>,
+    cache: HashMap<usize, Rc<Tile>>,
 }
 
 impl TileManager {
@@ -29,13 +28,13 @@ impl TileManager {
         let index = File::open(path.join("index.ka")).unwrap();
         Self {
             path,
-            cache: RefCell::new(HashMap::new()),
+            cache: HashMap::new(),
         }
     }
 
-    pub fn load(&self, tile_id: usize, window: &mut PistonWindow) -> Result<Rc<Tile>, String> {
+    pub fn load(&mut self, tile_id: usize, window: &mut PistonWindow) -> Result<Rc<Tile>, String> {
         let Self { path, cache } = self;
-        cache.borrow().get(&tile_id).cloned().map_or_else(
+        cache.get(&tile_id).cloned().map_or_else(
             || {
                 let texture = path.join(format!("{}.png", tile_id));
                 let texture = Texture::from_path(
@@ -51,7 +50,7 @@ impl TileManager {
                     texture,
                 };
                 let tile = Rc::new(tile);
-                cache.borrow_mut().insert(tile_id, tile.clone());
+                cache.insert(tile_id, tile.clone());
                 Ok(tile)
             },
             Ok,

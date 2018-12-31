@@ -400,7 +400,6 @@ dependencies = [
  "find_folder 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "gfx_device_gl 0.15.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "image 0.20.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "piston2d-gfx_graphics 0.54.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston_window 0.85.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
