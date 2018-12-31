@@ -6,7 +6,7 @@ use std::fs::File;
 use std::io::{Seek, SeekFrom};
 
 use super::state::State;
-use super::tile::{load_tileset, Tileset};
+use super::tile::TileManager;
 use crate::config::*;
 
 const LAYER_SIZE_BYTES: u64 = 64 * 64 * 2;
@@ -36,6 +36,7 @@ pub struct Scene {
     building_depth: Layer,
     object_depth: Layer,
     next_state: Option<Box<dyn State>>,
+    tile_manager: TileManager,
 }
 
 impl State for Scene {
@@ -76,7 +77,7 @@ impl State for Scene {
 }
 
 impl Scene {
-    pub fn load(scene_id: u16) -> Self {
+    pub fn load(scene_id: usize) -> Self {
         let mut file = File::open("./bin/save/ALLSIN.GRP").unwrap();
         file.seek(SeekFrom::Start(scene_id as u64 * SCENE_SIZE_BYTES))
             .unwrap();
@@ -94,6 +95,7 @@ impl Scene {
             building_depth,
             object_depth,
             next_state: None,
+            tile_manager: TileManager::new("smap"),
         }
     }
 }
