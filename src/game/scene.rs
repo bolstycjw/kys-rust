@@ -4,7 +4,7 @@ use std::fs::File;
 use std::io::{Seek, SeekFrom};
 
 use super::state::State;
-use super::tile::TileManager;
+use super::tile::{Tile, TileManager};
 use crate::config::*;
 use crate::engine::math;
 
@@ -66,19 +66,17 @@ impl State for Scene {
             for x in 0..64 {
                 let num = ground.0[y][x] as usize;
                 let tile = tile_manager.load(num / 2, window).unwrap();
-                let src_rect = [
-                    tile.x_off as f64,
-                    tile.y_off as f64,
-                    TILE_WIDTH as f64,
-                    TILE_HEIGHT as f64,
-                ];
+                let src_rect = [0.0, 0.0, TILE_WIDTH as f64, TILE_HEIGHT as f64];
                 let image = Image::new().src_rect(src_rect);
                 let (iso_x, iso_y) = math::cart_to_iso(x as i32, y as i32);
                 window.draw_2d(e, |c, g| {
                     image.draw(
                         &tile.texture,
                         &c.draw_state,
-                        c.view.trans(iso_x as f64, iso_y as f64),
+                        c.view.trans(
+                            iso_x as f64 - tile.x_off as f64,
+                            iso_y as f64 - tile.y_off as f64,
+                        ),
                         g,
                     )
                 });
