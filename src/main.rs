@@ -11,15 +11,14 @@ use piston_window::*;
 
 pub fn main() {
     let opengl = OpenGL::V3_2;
-    let mut window: PistonWindow =
-        WindowSettings::new("piston: image", [SCREEN_WIDTH, SCREEN_HEIGHT])
-            .exit_on_esc(true)
-            .opengl(opengl)
-            .build()
-            .unwrap();
+    let mut w: PistonWindow = WindowSettings::new("piston: image", [SCREEN_WIDTH, SCREEN_HEIGHT])
+        .exit_on_esc(true)
+        .opengl(opengl)
+        .build()
+        .unwrap();
 
-    window.set_lazy(true);
+    w.set_lazy(true);
 
     let mut game = game::Game::new();
-    game.run(&mut window);
+    game.run(&mut w);
 }

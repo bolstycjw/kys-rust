@@ -30,7 +30,7 @@ impl TileManager {
         }
     }
 
-    pub fn load(&mut self, tile_id: usize, window: &mut PistonWindow) -> Result<Rc<Tile>, String> {
+    pub fn load(&mut self, tile_id: usize, w: &mut PistonWindow) -> Result<Rc<Tile>, String> {
         let Self { path, cache } = self;
         cache.get(&tile_id).cloned().map_or_else(
             || {
@@ -40,7 +40,7 @@ impl TileManager {
                     .seek(SeekFrom::Start(tile_id as u64 * 4))
                     .unwrap();
                 let texture = Texture::from_path(
-                    &mut window.factory,
+                    &mut w.factory,
                     &texture,
                     Flip::None,
                     &TextureSettings::new().mag(Filter::Nearest),

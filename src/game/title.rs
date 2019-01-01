@@ -35,13 +35,13 @@ impl State for Title {
         self.next_state.clone()
     }
 
-    fn on_load(&mut self, window: &mut PistonWindow) {
+    fn on_load(&mut self, w: &mut PistonWindow) {
         let resource = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("resource")
             .unwrap();
         let rust_logo = resource.join("open.png");
         let rust_logo: G2dTexture = Texture::from_path(
-            &mut window.factory,
+            &mut w.factory,
             &rust_logo,
             Flip::None,
             &TextureSettings::new(),
@@ -50,12 +50,12 @@ impl State for Title {
         self.title = Some(rust_logo);
     }
 
-    fn render(&mut self, e: &Event, window: &mut PistonWindow) {
+    fn render(&mut self, e: &Event, w: &mut PistonWindow) {
         if let Some(rust_logo) = &self.title {
             let (width, height) = rust_logo.get_size();
             let sx = SCREEN_WIDTH as f64 / width as f64;
             let sy = SCREEN_HEIGHT as f64 / height as f64;
-            window.draw_2d(e, |c, g| {
+            w.draw_2d(e, |c, g| {
                 clear([1.0; 4], g);
                 image(rust_logo, c.transform.scale(sx, sy), g);
             });

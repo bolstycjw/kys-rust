@@ -7,9 +7,9 @@ pub trait State {
 
     fn next_state(&self) -> Option<Box<dyn State>>;
 
-    fn on_load(&mut self, window: &mut PistonWindow);
+    fn on_load(&mut self, w: &mut PistonWindow);
 
-    fn render(&mut self, e: &Event, window: &mut PistonWindow);
+    fn render(&mut self, e: &Event, w: &mut PistonWindow);
 }
 
 impl Clone for Box<dyn State> {

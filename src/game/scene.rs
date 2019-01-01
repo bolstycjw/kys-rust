@@ -6,7 +6,7 @@ use std::io::{Seek, SeekFrom};
 use super::state::State;
 use super::tile::{Tile, TileManager};
 use crate::config::*;
-use crate::engine::math;
+use crate::engine::draw;
 
 const LAYER_SIZE_BYTES: u64 = 64 * 64 * 2;
 const SCENE_SIZE_BYTES: u64 = LAYER_SIZE_BYTES * 6;
@@ -49,37 +49,30 @@ impl State for Scene {
         self.next_state.clone()
     }
 
-    fn on_load(&mut self, window: &mut PistonWindow) {
+    fn on_load(&mut self, w: &mut PistonWindow) {
         let smap = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("smap")
             .unwrap();
-        // self.tileset = Some(load_tileset(&smap, window));
+        // self.tileset = Some(load_tileset(&smap, w));
     }
 
-    fn render(&mut self, e: &Event, window: &mut PistonWindow) {
+    fn render(&mut self, e: &Event, w: &mut PistonWindow) {
         let Scene {
             tile_manager,
             ground,
+            building,
             ..
         } = self;
         for y in 0..64 {
             for x in 0..64 {
-                let num = ground.0[y][x] as usize;
-                let tile = tile_manager.load(num / 2, window).unwrap();
-                let src_rect = [0.0, 0.0, TILE_WIDTH as f64, TILE_HEIGHT as f64];
-                let image = Image::new().src_rect(src_rect);
-                let (iso_x, iso_y) = math::cart_to_iso(x as i32, y as i32);
-                window.draw_2d(e, |c, g| {
-                    image.draw(
-                        &tile.texture,
-                        &c.draw_state,
-                        c.view.trans(
-                            iso_x as f64 - tile.x_off as f64,
-                            iso_y as f64 - tile.y_off as f64,
-                        ),
-                        g,
-                    )
-                });
+                let tile_id = ground.0[y][x] as usize;
+                let tile = tile_manager.load(tile_id / 2, w).unwrap();
+                draw::draw_tile(tile, x as isize, y as isize, e, w);
+                let tile_id = building.0[y][x] as usize;
+                if tile_id > 0 {
+                    let tile = tile_manager.load(tile_id / 2, w).unwrap();
+                    draw::draw_tile(tile, x as isize, y as isize, e, w);
+                }
             }
         }
     }
