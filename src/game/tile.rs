@@ -16,7 +16,7 @@ pub struct Tile {
 #[derive(Clone)]
 pub struct TileManager {
     path: PathBuf,
-    cache: HashMap<usize, Rc<Tile>>,
+    cache: HashMap<u16, Rc<Tile>>,
 }
 
 impl TileManager {
@@ -30,7 +30,7 @@ impl TileManager {
         }
     }
 
-    pub fn load(&mut self, tile_id: usize, w: &mut PistonWindow) -> Result<Rc<Tile>, String> {
+    pub fn load(&mut self, tile_id: u16, w: &mut PistonWindow) -> Result<Rc<Tile>, String> {
         let Self { path, cache } = self;
         cache.get(&tile_id).cloned().map_or_else(
             || {

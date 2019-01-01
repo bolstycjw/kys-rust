@@ -4,9 +4,9 @@ use std::fs::File;
 use std::io::{Seek, SeekFrom};
 
 use super::state::State;
-use super::tile::{Tile, TileManager};
-use crate::config::*;
+use super::tile::TileManager;
 use crate::engine::draw;
+use crate::engine::math::Point;
 
 const LAYER_SIZE_BYTES: u64 = 64 * 64 * 2;
 const SCENE_SIZE_BYTES: u64 = LAYER_SIZE_BYTES * 6;
@@ -34,6 +34,7 @@ pub struct Scene {
     event: Layer,
     building_depth: Layer,
     object_depth: Layer,
+    cam_pos: Point,
     next_state: Option<Box<dyn State>>,
     tile_manager: TileManager,
 }
@@ -53,7 +54,6 @@ impl State for Scene {
         let smap = find_folder::Search::ParentsThenKids(3, 3)
             .for_folder("smap")
             .unwrap();
-        // self.tileset = Some(load_tileset(&smap, w));
     }
 
     fn render(&mut self, e: &Event, w: &mut PistonWindow) {
@@ -65,13 +65,14 @@ impl State for Scene {
         } = self;
         for y in 0..64 {
             for x in 0..64 {
-                let tile_id = ground.0[y][x] as usize;
+                let tile_id = ground.0[y][x];
                 let tile = tile_manager.load(tile_id / 2, w).unwrap();
-                draw::draw_tile(tile, x as isize, y as isize, e, w);
-                let tile_id = building.0[y][x] as usize;
+                let pos = Point::new(x as i32, y as i32);
+                draw::draw_tile(tile, pos, e, w);
+                let tile_id = building.0[y][x];
                 if tile_id > 0 {
                     let tile = tile_manager.load(tile_id / 2, w).unwrap();
-                    draw::draw_tile(tile, x as isize, y as isize, e, w);
+                    draw::draw_tile(tile, pos, e, w);
                 }
             }
         }
@@ -79,7 +80,7 @@ impl State for Scene {
 }
 
 impl Scene {
-    pub fn load(scene_id: usize) -> Self {
+    pub fn load(scene_id: u16) -> Self {
         let mut file = File::open("./bin/save/ALLSIN.GRP").unwrap();
         file.seek(SeekFrom::Start(scene_id as u64 * SCENE_SIZE_BYTES))
             .unwrap();
@@ -96,6 +97,7 @@ impl Scene {
             event,
             building_depth,
             object_depth,
+            cam_pos: Point::new(0, 0),
             next_state: None,
             tile_manager: TileManager::new("smap"),
         }
