@@ -6,6 +6,7 @@ use std::io::{Seek, SeekFrom};
 use super::state::State;
 use super::tile::TileManager;
 use crate::engine::draw;
+use crate::engine::math;
 use crate::engine::math::Point;
 
 const LAYER_SIZE_BYTES: u64 = 64 * 64 * 2;
@@ -61,13 +62,18 @@ impl State for Scene {
             tile_manager,
             ground,
             building,
+            cam_pos,
             ..
         } = self;
-        for y in 0..64 {
-            for x in 0..64 {
+        let (start_x, end_x, start_y, end_y) = math::compute_bounds(cam_pos);
+        println!("({},{},{},{})", start_x, end_x, start_y, end_y);
+        for y in start_y..end_y {
+            for x in start_x..end_x {
                 let tile_id = ground.0[y][x];
                 let tile = tile_manager.load(tile_id / 2, w).unwrap();
-                let pos = Point::new(x as i32, y as i32);
+                let pos = Point::new(x as i32, y as i32)
+                    .to_iso()
+                    .relative(cam_pos.to_iso());
                 draw::draw_tile(tile, pos, e, w);
                 let tile_id = building.0[y][x];
                 if tile_id > 0 {
@@ -97,7 +103,7 @@ impl Scene {
             event,
             building_depth,
             object_depth,
-            cam_pos: Point::new(0, 0),
+            cam_pos: Point::new(0, 23),
             next_state: None,
             tile_manager: TileManager::new("smap"),
         }
