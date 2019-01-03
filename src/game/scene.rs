@@ -1,10 +1,12 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use piston_window::*;
+use std::cmp;
 use std::fs::File;
 use std::io::{Seek, SeekFrom};
 
 use super::state::State;
 use super::tile::TileManager;
+use crate::config::*;
 use crate::engine::draw;
 use crate::engine::math;
 use crate::engine::math::Point;
@@ -65,23 +67,37 @@ impl State for Scene {
             cam_pos,
             ..
         } = self;
-        let (start_x, end_x, start_y, end_y) = math::compute_bounds(cam_pos);
-        println!("({},{},{},{})", start_x, end_x, start_y, end_y);
-        for y in start_y..=end_y {
-            for x in start_x..=end_x {
-                let tile_id = ground.0[y][x];
-                let tile = tile_manager.load(tile_id / 2, w).unwrap();
-                let pos = Point::new(x as i32, y as i32)
-                    .to_iso()
-                    .relative(cam_pos.to_iso());
-                draw::draw_tile(tile, pos, e, w);
-                let tile_id = building.0[y][x];
-                if tile_id > 0 {
+        // let (start_x, end_x, start_y, end_y) = math::compute_bounds(cam_pos);
+        // println!("({},{},{},{})", start_x, end_x, start_y, end_y);
+        let region_y = CENTER_Y / TILE_HEIGHT as i32;
+        let region_x = CENTER_X / TILE_WIDTH as i32;
+        for ry in -region_y..=region_y {
+            for rx in -region_x..=region_x {
+                let x = cam_pos.x + rx + ry;
+                let y = cam_pos.y - rx + ry;
+                // if rx == -region_x && -region_y == ry {
+                //     println!("region_x: {}, region_y: {}", rx, ry);
+                //     println!("( {}, {} )", x, y);
+                // }
+                if math::within_bounds(x, y) {
+                    println!("( {}, {} )", x, y);
+                    let x = x as usize;
+                    let y = y as usize;
+                    let tile_id = ground.0[y][x];
                     let tile = tile_manager.load(tile_id / 2, w).unwrap();
+                    let pos = Point::new(x as i32, y as i32)
+                        .to_iso()
+                        .relative(cam_pos.to_iso());
                     draw::draw_tile(tile, pos, e, w);
+                    let tile_id = building.0[y][x];
+                    if tile_id > 0 {
+                        let tile = tile_manager.load(tile_id / 2, w).unwrap();
+                        draw::draw_tile(tile, pos, e, w);
+                    }
                 }
             }
         }
+        panic!("sdf")
     }
 }
 
@@ -103,7 +119,7 @@ impl Scene {
             event,
             building_depth,
             object_depth,
-            cam_pos: Point::new(53, 53),
+            cam_pos: Point::new(0, 0),
             next_state: None,
             tile_manager: TileManager::new("smap"),
         }

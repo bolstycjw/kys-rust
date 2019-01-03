@@ -8,7 +8,6 @@ use std::boxed::Box;
 
 use self::state::State;
 use self::title::Title;
-use crate::config::*;
 
 pub struct Game {
     state: Box<dyn State>,
@@ -30,22 +29,14 @@ impl Game {
     }
 
     pub fn run(&mut self, window: &mut PistonWindow) {
-        let opengl = OpenGL::V3_2;
-        let mut window: PistonWindow =
-            WindowSettings::new("piston: image", [SCREEN_WIDTH, SCREEN_HEIGHT])
-                .exit_on_esc(true)
-                .opengl(opengl)
-                .build()
-                .unwrap();
-
-        self.state.on_load(&mut window);
+        self.state.on_load(window);
         let mut events = Events::new(EventSettings::new());
-        while let Some(e) = events.next(&mut window) {
-            if let Some(r) = e.render_args() {
-                window.draw_2d(&e, |c, g| {
+        while let Some(e) = events.next(window) {
+            if let Some(_r) = e.render_args() {
+                window.draw_2d(&e, |_c, g| {
                     clear([0.0; 4], g);
                 });
-                self.state.render(&e, &mut window);
+                self.state.render(&e, window);
             };
 
             if let Some(_args) = e.button_args() {
