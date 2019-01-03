@@ -74,7 +74,6 @@ impl State for Scene {
                 let x = cam_pos.x + rx + ry / 2;
                 let y = cam_pos.y - rx + (ry - ry / 2);
                 if math::within_bounds(x, y) {
-                    println!("( {}, {} )", x, y);
                     let x = x as usize;
                     let y = y as usize;
                     let tile_id = ground.0[y][x];
