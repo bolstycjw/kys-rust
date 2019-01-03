@@ -27,11 +27,13 @@ impl Point {
 }
 
 pub fn compute_bounds(pos: &Point) -> (usize, usize, usize, usize) {
-    let start_x = cmp::max(pos.x - COL_TILE_COUNT as i32, 0);
-    let start_y = cmp::max(pos.y - COL_TILE_COUNT as i32, 0);
-    let end_x = cmp::min(pos.x + COL_TILE_COUNT as i32, 64);
-    let end_y = cmp::min(pos.y + COL_TILE_COUNT as i32, 64);
-    // (0, 64, 0, 64)
+    let diag_scr = ((SCREEN_WIDTH.pow(2) + SCREEN_HEIGHT.pow(2)) as f64).sqrt();
+    let diag_tile = ((HALF_TILE_WIDTH.pow(2) + HALF_TILE_HEIGHT.pow(2)) as f64).sqrt();;
+    let diag_tile_count = (((diag_scr / diag_tile) / 2.0).ceil() + 2.0) as i32;
+    let start_x = cmp::max(pos.x - diag_tile_count, 0);
+    let start_y = cmp::max(pos.y - diag_tile_count, 0);
+    let end_x = cmp::min(pos.x + diag_tile_count, 63);
+    let end_y = cmp::min(pos.y + diag_tile_count, 63);
     (
         start_x as usize,
         end_x as usize,
