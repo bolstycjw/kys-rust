@@ -67,7 +67,7 @@ impl State for Scene {
             cam_pos,
             ..
         } = self;
-        let region_y = (CENTER_Y / HALF_TILE_HEIGHT as i32) + 4;
+        let region_y = (CENTER_Y / HALF_TILE_HEIGHT as i32) + 8;
         let region_x = (CENTER_X / TILE_WIDTH as i32) + 2;
         for ry in -region_y..=region_y {
             for rx in -region_x..=region_x {
@@ -111,7 +111,7 @@ impl Scene {
             event,
             building_depth,
             object_depth,
-            cam_pos: Point::new(50, 50),
+            cam_pos: Point::new(0, 0),
             next_state: None,
             tile_manager: TileManager::new("smap"),
         }
