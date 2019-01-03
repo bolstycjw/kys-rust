@@ -67,18 +67,12 @@ impl State for Scene {
             cam_pos,
             ..
         } = self;
-        // let (start_x, end_x, start_y, end_y) = math::compute_bounds(cam_pos);
-        // println!("({},{},{},{})", start_x, end_x, start_y, end_y);
-        let region_y = CENTER_Y / TILE_HEIGHT as i32;
-        let region_x = CENTER_X / TILE_WIDTH as i32;
+        let region_y = (CENTER_Y / HALF_TILE_HEIGHT as i32) + 4;
+        let region_x = (CENTER_X / TILE_WIDTH as i32) + 2;
         for ry in -region_y..=region_y {
             for rx in -region_x..=region_x {
-                let x = cam_pos.x + rx + ry;
-                let y = cam_pos.y - rx + ry;
-                // if rx == -region_x && -region_y == ry {
-                //     println!("region_x: {}, region_y: {}", rx, ry);
-                //     println!("( {}, {} )", x, y);
-                // }
+                let x = cam_pos.x + rx + ry / 2;
+                let y = cam_pos.y - rx + (ry - ry / 2);
                 if math::within_bounds(x, y) {
                     println!("( {}, {} )", x, y);
                     let x = x as usize;
@@ -119,7 +113,7 @@ impl Scene {
             event,
             building_depth,
             object_depth,
-            cam_pos: Point::new(0, 0),
+            cam_pos: Point::new(50, 50),
             next_state: None,
             tile_manager: TileManager::new("smap"),
         }
