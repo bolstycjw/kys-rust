@@ -90,7 +90,6 @@ impl State for Scene {
                 }
             }
         }
-        panic!("sdf")
     }
 }
 
